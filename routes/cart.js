@@ -30,25 +30,25 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
+  const { id } = req.params; // This is likely the product_id coming from the frontend
+  const { quantity } = req.body;
   try {
-    const { quantity } = req.body;
-    if (quantity <= 0) {
-      await pool.query('DELETE FROM cart WHERE id = $1', [req.params.id]);
-    } else {
-      await pool.query('UPDATE cart SET quantity = $1 WHERE id = $2', [quantity, req.params.id]);
-    }
-    res.json({ message: 'Cart updated' });
+    // Changed "WHERE id" to "WHERE product_id"
+    await pool.query('UPDATE cart SET quantity = $1 WHERE product_id = $2', [quantity, id]);
+    res.json({ message: "Quantity updated" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json(err.message);
   }
 });
 
 router.delete('/:id', async (req, res) => {
+  const { id } = req.params; // This is likely the product_id
   try {
-    await pool.query('DELETE FROM cart WHERE id = $1', [req.params.id]);
-    res.json({ message: 'Removed from cart' });
+    // Changed "WHERE id" to "WHERE product_id"
+    await pool.query('DELETE FROM cart WHERE product_id = $1', [id]);
+    res.json({ message: "Item removed" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json(err.message);
   }
 });
 
