@@ -41,7 +41,8 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/clear', async (req, res) => {
   try {
-    await pool.query('TRUNCATE TABLE cart CASCADE'); 
+    // Changed from TRUNCATE TABLE to DELETE FROM
+    await pool.query('DELETE FROM cart'); 
     res.json({ message: "Cart cleared successfully" });
   } catch (err) {
     console.error("Error clearing cart:", err);
