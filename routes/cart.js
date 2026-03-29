@@ -5,8 +5,7 @@ const pool = require('../db');
 router.get('/', async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT cart.id, cart.quantity, products.* 
-       FROM cart JOIN products ON cart.product_id = products.id`
+      `SELECT cart.id, cart.quantity, products.* FROM cart JOIN products ON cart.product_id = products.id`
     );
     res.json(result.rows);
   } catch (err) {
@@ -30,10 +29,9 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const { id } = req.params; // This is likely the product_id coming from the frontend
+  const { id } = req.params; 
   const { quantity } = req.body;
   try {
-    // Changed "WHERE id" to "WHERE product_id"
     await pool.query('UPDATE cart SET quantity = $1 WHERE product_id = $2', [quantity, id]);
     res.json({ message: "Quantity updated" });
   } catch (err) {
@@ -41,10 +39,20 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params; // This is likely the product_id
+router.delete('/clear', async (req, res) => {
   try {
-    // Changed "WHERE id" to "WHERE product_id"
+    await pool.query('TRUNCATE TABLE cart CASCADE'); 
+    res.json({ message: "Cart cleared successfully" });
+  } catch (err) {
+    console.error("Error clearing cart:", err);
+    res.status(500).json({ error: "Failed to clear cart" });
+  }
+});
+
+
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params; 
+  try {
     await pool.query('DELETE FROM cart WHERE product_id = $1', [id]);
     res.json({ message: "Item removed" });
   } catch (err) {
